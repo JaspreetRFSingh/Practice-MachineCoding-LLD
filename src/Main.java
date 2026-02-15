@@ -4,6 +4,7 @@ public class Main {
     public static void main(String[] args) {
         testHitCounter();
         testChess();
+        testElevatorSystem();
     }
 
     static void testHitCounter() {
@@ -34,5 +35,20 @@ public class Main {
         // White King steps sideways
         System.out.println("WK (0,4)->(0,3): " + chess.move(0, 4, 0, 3));  // ""
         System.out.println("Game status:      " + chess.getGameStatus());   // 0
+    }
+
+    static void testElevatorSystem() {
+        System.out.println("\n=== ElevatorSystem ===");
+        elevatorsystem.ElevatorSystem es = new elevatorsystem.ElevatorSystem();
+        es.init(10, 2, 5, null);
+        int lift = es.requestLift(3, 'U');
+        System.out.println("Lift assigned (floor 3, going up): " + lift);
+        es.pressFloorButtonInLift(lift, 6);
+        es.tick();
+        System.out.println("After tick 1: " + es.getLiftState(lift));
+        es.tick();
+        System.out.println("After tick 2: " + es.getLiftState(lift));
+        es.tick();
+        System.out.println("After tick 3: " + es.getLiftState(lift));
     }
 }
