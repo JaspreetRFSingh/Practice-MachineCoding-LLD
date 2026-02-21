@@ -1,10 +1,12 @@
 import HitCounter.HitCounter;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
         testHitCounter();
         testChess();
         testElevatorSystem();
+        testMeetingRoomScheduler();
     }
 
     static void testHitCounter() {
@@ -50,5 +52,16 @@ public class Main {
         System.out.println("After tick 2: " + es.getLiftState(lift));
         es.tick();
         System.out.println("After tick 3: " + es.getLiftState(lift));
+    }
+
+    static void testMeetingRoomScheduler() {
+        System.out.println("\n=== MeetingRoomScheduler ===");
+        MeetingRoomScheduler.RoomBooking rb =
+                new MeetingRoomScheduler.RoomBooking(List.of("R1", "R2", "R3"));
+        System.out.println("Book m1 (10-20): " + rb.bookMeeting("m1", 10, 20));  // R1
+        System.out.println("Book m2 (15-25): " + rb.bookMeeting("m2", 15, 25));  // R2
+        System.out.println("Book m3 (10-20): " + rb.bookMeeting("m3", 10, 20));  // R3
+        System.out.println("Cancel m1:       " + rb.cancelMeeting("m1"));         // true
+        System.out.println("Book m4 (10-20): " + rb.bookMeeting("m4", 10, 20));  // R1
     }
 }
