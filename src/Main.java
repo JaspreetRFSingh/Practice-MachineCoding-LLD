@@ -7,6 +7,7 @@ public class Main {
         testChess();
         testElevatorSystem();
         testMeetingRoomScheduler();
+        testParkingLot();
     }
 
     static void testHitCounter() {
@@ -63,5 +64,21 @@ public class Main {
         System.out.println("Book m3 (10-20): " + rb.bookMeeting("m3", 10, 20));  // R3
         System.out.println("Cancel m1:       " + rb.cancelMeeting("m1"));         // true
         System.out.println("Book m4 (10-20): " + rb.bookMeeting("m4", 10, 20));  // R1
+    }
+
+    static void testParkingLot() {
+        System.out.println("\n=== ParkingLot ===");
+        ParkingLot.Solution lot = new ParkingLot.Solution();
+        // 1 floor, 2 rows: spots typed as [2W, 4W, 2W] and [4W, 4W, 2W]
+        int[][][] parking = {{{2, 4, 2}, {4, 4, 2}}};
+        lot.init(parking);
+        String s2w = lot.park(2, "MH01AB1234", "T001", 0);
+        String s4w = lot.park(4, "MH02CD5678", "T002", 0);
+        System.out.println("2W parked at:          " + s2w);                          // 0-0-0
+        System.out.println("4W parked at:          " + s4w);                          // 0-0-1
+        System.out.println("Search by ticket T001: " + lot.searchVehicle("T001"));    // 0-0-0
+        System.out.println("Free 2W (floor 0):     " + lot.getFreeSpotsCount(0, 2)); // 1
+        lot.removeVehicle(s2w);
+        System.out.println("Free 2W after unpark:  " + lot.getFreeSpotsCount(0, 2)); // 2
     }
 }
