@@ -8,6 +8,7 @@ public class Main {
         testElevatorSystem();
         testMeetingRoomScheduler();
         testParkingLot();
+        testSplitwise();
     }
 
     static void testHitCounter() {
@@ -80,5 +81,21 @@ public class Main {
         System.out.println("Free 2W (floor 0):     " + lot.getFreeSpotsCount(0, 2)); // 1
         lot.removeVehicle(s2w);
         System.out.println("Free 2W after unpark:  " + lot.getFreeSpotsCount(0, 2)); // 2
+    }
+
+    static void testSplitwise() {
+        System.out.println("\n=== Splitwise ===");
+        splitwise.SplitBook sb = new splitwise.SplitBook();
+        sb.registerUser("alice", "Alice");
+        sb.registerUser("bob", "Bob");
+        sb.registerUser("charlie", "Charlie");
+        // Alice pays 90 for all three; each owes 30 → bob and charlie owe alice
+        sb.recordExpense(1, List.of("alice", "bob", "charlie"), List.of(90, 0, 0));
+        System.out.println("Balances after expense of 90 (paid by alice):");
+        sb.listBalances().forEach(System.out::println);
+        // Add a second expense: Bob pays 60 for alice and bob; each owes 30
+        sb.recordExpense(2, List.of("alice", "bob"), List.of(0, 60));
+        System.out.println("Balances after bob pays 60 for alice and bob:");
+        sb.listBalances().forEach(System.out::println);
     }
 }
