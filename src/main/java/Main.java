@@ -9,6 +9,7 @@ public class Main {
         testMeetingRoomScheduler();
         testParkingLot();
         testSplitwise();
+        testBookMyShow();
     }
 
     static void testHitCounter() {
@@ -97,5 +98,64 @@ public class Main {
         sb.recordExpense(2, List.of("alice", "bob"), List.of(0, 60));
         System.out.println("Balances after bob pays 60 for alice and bob:");
         sb.listBalances().forEach(System.out::println);
+    }
+
+    static void testBookMyShow() {
+        System.out.println("\n=== BookMyShow ===");
+        BookMyShow.Solution bms = new BookMyShow.Solution();
+        BookMyShow.Helper10 h   = new BookMyShow.Helper10();
+        bms.init(h);
+
+        // Cinema 0 in city 1: 4 screens, each 5 rows x 10 cols (50 seats/screen)
+        bms.addCinema(0, 1, 4, 5, 10);
+        // Cinema 1 in city 1: 2 screens, each 3 rows x 5 cols
+        bms.addCinema(1, 1, 2, 3, 5);
+
+        // Shows in cinema 0
+        bms.addShow(1, 4,  0, 1, 1710516108725L, 1710523308725L); // movie 4, screen 1
+        bms.addShow(2, 11, 0, 3, 1710516108725L, 1710523308725L); // movie 11, screen 3
+        bms.addShow(3, 4,  0, 2, 1710519708725L, 1710526908725L); // movie 4, screen 2 (later)
+
+        // Show in cinema 1
+        bms.addShow(4, 4,  1, 1, 1710516108725L, 1710523308725L); // movie 4 in cinema 1
+
+        // listCinemas
+        System.out.println("Cinemas for movie 0, city 1: " + bms.listCinemas(0, 1)); // []
+        System.out.println("Cinemas for movie 4, city 1: " + bms.listCinemas(4, 1)); // [0, 1]
+        System.out.println("Cinemas for movie 11, city 1:" + bms.listCinemas(11, 1)); // [0]
+
+        // listShows (descending startTime, then ascending showId)
+        System.out.println("Shows for movie 4, cinema 0: " + bms.listShows(4, 0));   // [3, 1]
+        System.out.println("Shows for movie 11, cinema 0:" + bms.listShows(11, 0));  // [2]
+
+        // Free seats
+        System.out.println("Free seats show 1: " + bms.getFreeSeatsCount(1)); // 50
+
+        // Book 4 consecutive seats → row 0, cols 0-3
+        List<String> t1 = bms.bookTicket("tkt-1", 1, 4);
+        System.out.println("tkt-1 seats: " + t1);                            // [0-0,0-1,0-2,0-3]
+        System.out.println("Free seats show 1: " + bms.getFreeSeatsCount(1)); // 46
+
+        // Book 8 seats (more than remaining in any single row → scatter across rows)
+        List<String> t2 = bms.bookTicket("tkt-2", 1, 8);
+        System.out.println("tkt-2 seats: " + t2);                            // [0-4..0-9, 1-0, 1-1]
+        System.out.println("Free seats show 1: " + bms.getFreeSeatsCount(1)); // 38
+
+        // Cancel tkt-1 → seats released
+        System.out.println("Cancel tkt-1: " + bms.cancelTicket("tkt-1"));    // true
+        System.out.println("Free seats show 1: " + bms.getFreeSeatsCount(1)); // 42
+
+        // Double-cancel → false
+        System.out.println("Cancel tkt-1 again: " + bms.cancelTicket("tkt-1")); // false
+
+        // Cancel unknown ticket → false
+        System.out.println("Cancel unknown: " + bms.cancelTicket("tkt-999")); // false
+
+        // Book more than available → empty
+        List<String> tBig = bms.bookTicket("tkt-big", 1, 100);
+        System.out.println("Over-book result: " + tBig);                      // []
+
+        // Non-existent show
+        System.out.println("Free seats show 99: " + bms.getFreeSeatsCount(99)); // 0
     }
 }
