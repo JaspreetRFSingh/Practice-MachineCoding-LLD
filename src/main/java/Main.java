@@ -10,6 +10,7 @@ public class Main {
         testParkingLot();
         testSplitwise();
         testBookMyShow();
+        testJobScheduler();
     }
 
     static void testHitCounter() {
@@ -157,5 +158,31 @@ public class Main {
 
         // Non-existent show
         System.out.println("Free seats show 99: " + bms.getFreeSeatsCount(99)); // 0
+    }
+
+    static void testJobScheduler() {
+        System.out.println("\n=== JobScheduler ===");
+        JobScheduler.Solution js = new JobScheduler.Solution();
+
+        // Example 1: Multi-Capability Match + Criteria 0 (Least Unfinished) + Tie
+        js.addMachine("m-10", new String[]{"image compression", "audio extraction", "video thumbnail generation"});
+        js.addMachine("m-2",  new String[]{"image compression", "audio extraction"});
+
+        String r1 = js.assignMachineToJob("job-A", new String[]{"image compression", "audio extraction"}, 0);
+        System.out.println("job-A → " + r1);  // m-10 (lex smaller than m-2)
+
+        // Example 2: Completion Updates → Criteria 1 (Most Finished)
+        js.jobCompleted("job-A");  // m-10: unfinished=0, finished=1
+        String r2 = js.assignMachineToJob("job-B", new String[]{"image compression"}, 1);
+        System.out.println("job-B → " + r2);  // m-10 (most finished = 1)
+
+        // Example 3: No Compatible Machine
+        String r3 = js.assignMachineToJob("job-C", new String[]{"speech to text conversion"}, 0);
+        System.out.println("job-C → \"" + r3 + "\"");  // ""
+
+        // Case-insensitivity check
+        js.addMachine("m-3", new String[]{"PDF Thumbnail Creator", "Plain Text Compression"});
+        String r4 = js.assignMachineToJob("job-D", new String[]{"pdf thumbnail creator"}, 0);
+        System.out.println("job-D (case-insensitive) → " + r4);  // m-3
     }
 }
