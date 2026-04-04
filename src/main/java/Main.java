@@ -11,6 +11,7 @@ public class Main {
         testSplitwise();
         testBookMyShow();
         testJobScheduler();
+        testRateLimiter();
     }
 
     static void testHitCounter() {
@@ -184,5 +185,22 @@ public class Main {
         js.addMachine("m-3", new String[]{"PDF Thumbnail Creator", "Plain Text Compression"});
         String r4 = js.assignMachineToJob("job-D", new String[]{"pdf thumbnail creator"}, 0);
         System.out.println("job-D (case-insensitive) → " + r4);  // m-3
+    }
+
+    static void testRateLimiter() {
+        System.out.println("\n=== RateLimiter ===");
+        RateLimiter.RateLimiter rl = new RateLimiter.RateLimiter();
+
+        // Fixed-window-counter: max 2 requests every 5 seconds
+        rl.addResource("login-api", "fixed-window-counter", "2,5");
+        System.out.println(rl.isAllowed("login-api", 1));  // true  (count=1, window [0..4])
+        System.out.println(rl.isAllowed("login-api", 2));  // true  (count=2, window [0..4])
+        System.out.println(rl.isAllowed("login-api", 4));  // false (count=3 > 2, blocked)
+
+        // Reconfigure to sliding-window-counter: max 2 requests in any 3-second window
+        rl.addResource("login-api", "sliding-window-counter", "2,3");
+        System.out.println(rl.isAllowed("login-api", 6));  // true  ([4..6] has {6},     count=1)
+        System.out.println(rl.isAllowed("login-api", 7));  // true  ([5..7] has {6,7},   count=2)
+        System.out.println(rl.isAllowed("login-api", 8));  // false ([6..8] would be {6,7,8}, count=3 > 2)
     }
 }

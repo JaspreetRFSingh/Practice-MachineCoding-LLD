@@ -16,3 +16,4 @@ A collection of LLD problems implemented in Java.
 | 6 | [MeetingRoomScheduler](src/main/java/MeetingRoomScheduler/notes.md) | Conference room booking system — prevents overlapping reservations and assigns the lexicographically smallest free room |
 | 7 | [ParkingLot](src/main/java/ParkingLot/notes.md) | Multi-floor parking lot with 2W/4W spot types and pluggable parking strategies |
 | 8 | [Splitwise](src/main/java/splitwise/notes.md) | Expense splitting app — tracks net balances across users and resolves who owes whom |
+| 9 | [RateLimiter](src/main/java/RateLimiter/notes.md) | In-memory rate limiter with pluggable algorithms (fixed-window, sliding-window) per resource, reconfigurable at runtime |
