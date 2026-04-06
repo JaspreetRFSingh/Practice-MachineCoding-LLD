@@ -1,4 +1,5 @@
 import HitCounter.HitCounter;
+import java.util.Arrays;
 import java.util.List;
 
 public class Main {
@@ -12,6 +13,8 @@ public class Main {
         testBookMyShow();
         testJobScheduler();
         testRateLimiter();
+        testShoppingCart();
+        testCustomHashMap();
     }
 
     static void testHitCounter() {
@@ -202,5 +205,93 @@ public class Main {
         System.out.println(rl.isAllowed("login-api", 6));  // true  ([4..6] has {6},     count=1)
         System.out.println(rl.isAllowed("login-api", 7));  // true  ([5..7] has {6,7},   count=2)
         System.out.println(rl.isAllowed("login-api", 8));  // false ([6..8] would be {6,7,8}, count=3 > 2)
+    }
+
+    static void testShoppingCart() {
+        System.out.println("\n=== ShoppingCart ===");
+
+        // Example 1 – Normal flow
+        ShoppingCart.ShoppingCart cart1 = new ShoppingCart.ShoppingCart(
+                Arrays.asList("coca-cola-pack,8,12", "juice-box,5,10"));
+        System.out.println(cart1.addItem("coca-cola-pack", 2));  // SUCCESS
+        System.out.println(cart1.addItem("juice-box", 3));       // SUCCESS
+        System.out.println(cart1.viewCart());                     // [coca-cola-pack,2, juice-box,3]
+        System.out.println(cart1.checkout());                     // 31
+        System.out.println(cart1.viewCart());                     // []
+
+        // Example 2 – Out of stock
+        ShoppingCart.ShoppingCart cart2 = new ShoppingCart.ShoppingCart(
+                Arrays.asList("laptop,900,1"));
+        System.out.println(cart2.addItem("laptop", 2));          // OUT OF STOCK
+        System.out.println(cart2.viewCart());                     // []
+
+        // Example 3 – Unavailable & empty checkout
+        ShoppingCart.ShoppingCart cart3 = new ShoppingCart.ShoppingCart(
+                Arrays.asList("book,50,2"));
+        System.out.println(cart3.addItem("pen", 1));             // UNAVAILABLE
+        System.out.println(cart3.checkout());                     // -1
+
+        // Example 4 – Stock reservation: adding to cart doesn't let you over-commit
+        ShoppingCart.ShoppingCart cart4 = new ShoppingCart.ShoppingCart(
+                Arrays.asList("widget,10,3"));
+        System.out.println(cart4.addItem("widget", 2));          // SUCCESS (reserved 2 of 3)
+        System.out.println(cart4.addItem("widget", 2));          // OUT OF STOCK (2+2 > 3)
+        System.out.println(cart4.checkout());                     // 20 (2 * 10)
+
+        // Example 5 – Stock decrements after checkout (not reset)
+        ShoppingCart.ShoppingCart cart5 = new ShoppingCart.ShoppingCart(
+                Arrays.asList("coca-cola-pack,8,12"));
+        cart5.addItem("coca-cola-pack", 3);
+        cart5.checkout();                                         // 9 units remain
+        System.out.println(cart5.addItem("coca-cola-pack", 10)); // OUT OF STOCK (only 9 left)
+        System.out.println(cart5.addItem("coca-cola-pack", 9));  // SUCCESS
+    }
+
+    static void testCustomHashMap() {
+        System.out.println("\n=== CustomHashMap ===");
+
+        // Example 1 – Basic put/get/update/remove
+        CustomHashMap.CustomHashMap map1 = new CustomHashMap.CustomHashMap(0.25, 0.75);
+        map1.put("a", "one");
+        map1.put("bb", "two");
+        System.out.println(map1.get("a"));         // one
+        System.out.println(map1.get("x"));         // (empty)
+        map1.put("a", "ONE");                      // update
+        System.out.println(map1.get("a"));         // ONE
+        System.out.println(map1.remove("bb"));     // two
+        System.out.println(map1.remove("bb"));     // (empty)
+        System.out.println(map1.size());           // 1
+
+        // Example 2 – Grow rehash (2 → 4 → 8) with collision tracking
+        CustomHashMap.CustomHashMap map2 = new CustomHashMap.CustomHashMap(0.25, 0.75);
+        map2.put("a",    "1");  // size=1, LF=0.50, buckets=2
+        map2.put("bb",   "2");  // size=2, LF=1.00 > 0.75 → GROW to 4
+        map2.put("abcd", "3");  // size=3, LF=0.75, buckets=4 → no rehash
+        map2.put("m",    "4");  // size=4, LF=1.00 > 0.75 → GROW to 8
+        map2.put("zzz",  "5");  // size=5, LF=0.63, buckets=8 → no rehash
+
+        System.out.println(map2.bucketsCount());         // 8
+        System.out.println(map2.size());                 // 5
+        System.out.println(map2.getBucketKeys(0));       // [bb]
+        System.out.println(map2.getBucketKeys(2));       // [a, abcd]
+        System.out.println(map2.getBucketKeys(6));       // [m]
+        System.out.println(map2.getBucketKeys(7));       // [zzz]
+        System.out.println(map2.getBucketKeys(1));       // []
+        System.out.println(map2.getBucketKeys(99));      // [] (out of bounds)
+
+        // Example 3 – Shrink rehash on remove
+        // Start: bucketsCount=8, size=5. Remove until LF < minLF (0.25)
+        // After 1 remove: size=4, LF=round2(4/8)=0.50 → ok
+        // After 2 removes: size=3, LF=round2(3/8)=0.38 → ok
+        // After 3 removes: size=2, LF=round2(2/8)=0.25 → ok (not strictly less)
+        // After 4 removes: size=1, LF=round2(1/8)=0.13 < 0.25 → SHRINK to 4
+        //   round2(1/4)=0.25 → ok (not strictly less), stop
+        map2.remove("a");
+        map2.remove("bb");
+        map2.remove("abcd");
+        map2.remove("m");  // triggers shrink: 8 → 4
+        System.out.println(map2.bucketsCount());        // 4
+        System.out.println(map2.size());                // 1
+        System.out.println(map2.get("zzz"));            // 5
     }
 }

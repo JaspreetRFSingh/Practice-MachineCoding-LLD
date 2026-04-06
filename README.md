@@ -17,3 +17,5 @@ A collection of LLD problems implemented in Java.
 | 7 | [ParkingLot](src/main/java/ParkingLot/notes.md) | Multi-floor parking lot with 2W/4W spot types and pluggable parking strategies |
 | 8 | [Splitwise](src/main/java/splitwise/notes.md) | Expense splitting app — tracks net balances across users and resolves who owes whom |
 | 9 | [RateLimiter](src/main/java/RateLimiter/notes.md) | In-memory rate limiter with pluggable algorithms (fixed-window, sliding-window) per resource, reconfigurable at runtime |
+| 10 | [ShoppingCart](src/main/java/ShoppingCart/notes.md) | In-memory shopping cart with catalog-backed stock reservation, lazy-sort view, and atomic checkout |
+| 11 | [CustomHashMap](src/main/java/CustomHashMap/notes.md) | HashMap built from scratch — separate chaining, custom hash, and load-factor-driven grow/shrink rehashing |
